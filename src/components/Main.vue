@@ -69,7 +69,7 @@
       <div>
         Signature
       </div>
-      <div class="break-all text-purple-500 hover:underline select-none cursor-pointer">
+      <div class="break-all text-purple-500 hover:underline cursor-pointer">
         https://solscan.io/tx/5jNUxmi1jrm8SKuQ395Qk4XmiM3mUwojpknBNCEiQ6hYnTyC5XjNrDowJT9RbUzuqpnsxgi8VXTCwprvC3RM3GwR
       </div>
     </div>
