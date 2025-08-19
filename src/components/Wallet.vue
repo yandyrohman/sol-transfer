@@ -28,7 +28,7 @@ function handleAddWallet() {
     formWallet.name = ''
     formWallet.privateKey = ''
   } catch {
-    alert('Ada masalah saat menambahkan wallet, silahkan cek private key anda.')
+    alert('There was a problem adding the wallet, please check your private key.')
   }
 }
 
