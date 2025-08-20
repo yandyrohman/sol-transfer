@@ -1,7 +1,7 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { ComputeBudgetProgram, Connection, Keypair, PublicKey, SystemProgram, TransactionMessage, VersionedTransaction } from '@solana/web3.js';
-import { activeWallet, formWallet, wallets } from '../storage';
+import { activeWallet, formWallet, solanaInUsd, wallets } from '../storage';
 
 import bs58 from 'bs58'
 
@@ -13,10 +13,20 @@ const dataBalance = ref(0)
 const dataMinimumRent = ref(0)
 const dataSignature = ref(null)
 
+const showUsd = ref(false)
 const showWarningRent = ref(false)
 const showWarningInvalid = ref(false)
 const formWalletDestination = ref('')
 const formAmount = ref(null)
+
+const usdOrSolBalance = computed(() => {
+  if (showUsd.value) {
+    const usdValue = Number(solanaInUsd.value * (dataBalance.value / 1e9)).toFixed(2)
+    return `${formatNumber(usdValue)} USD`
+  } else {
+    return `${formatNumber(dataBalance.value / 1e9)} SOL`
+  }
+})
 
 function formatNumber(num) {
   const [intPart, decimalPart] = num.toString().split('.')
@@ -127,6 +137,10 @@ async function handleTransfer() {
   }
 }
 
+function handleChangeBalanceFormat() {
+  showUsd.value = !showUsd.value
+}
+
 watch(() => activeWallet.value, () => {
   loadingTransfer.value = false
   dataSignature.value = null
@@ -170,8 +184,11 @@ watch(() => activeWallet.value, () => {
           <div class="font-medium text-[20px]">
             {{ formatNumber(dataBalance) }} Lamp.
           </div>
-          <div class="text-neutral-500">
-            {{ formatNumber(dataBalance / 1e9) }} SOL
+          <div
+            class="w-max text-neutral-500 cursor-pointer hover:underline"
+            @click="handleChangeBalanceFormat"
+          >
+            {{ usdOrSolBalance }}
           </div>
         </div>
         <div class="w-full h-max border border-neutral-200">

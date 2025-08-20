@@ -1,6 +1,24 @@
 <script setup>
-import Wallet from './components/Wallet.vue';
-import Main from './components/Main.vue';
+import { onMounted } from 'vue'
+import { solanaInUsd } from './storage'
+
+import Wallet from './components/Wallet.vue'
+import Main from './components/Main.vue'
+
+async function handleFetchPrices() {
+  const url = 'https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd'
+  try {
+    const response = await fetch(url)
+    const rateData = await response.json()
+    solanaInUsd.value = rateData.solana.usd
+  } catch (error) {
+    alert(error)
+  }
+}
+
+onMounted(() => {
+  handleFetchPrices()
+})
 </script>
 
 <template>
