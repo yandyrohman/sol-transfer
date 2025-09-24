@@ -1,6 +1,7 @@
 <script setup>
-import { Keypair } from '@solana/web3.js';
-import { activeWallet, formWallet, wallets } from '../storage';
+import { Keypair } from '@solana/web3.js'
+import { activeWallet, formWallet, wallets } from '../storage'
+import { Buffer } from 'buffer'
 
 import bs58 from 'bs58'
 
@@ -32,6 +33,12 @@ function handleAddWallet() {
   }
 }
 
+async function handleCreatePrivateKey() {
+  const keypair = Keypair.generate()
+  formWallet.name = await handleGetUniqueName(keypair.publicKey.toBytes())
+  formWallet.privateKey = bs58.encode(Buffer.from(keypair.secretKey))
+}
+
 function handleSelectWallet(wallet) {
   if (activeWallet.value && activeWallet.value.walletStr === wallet.walletStr) {
     activeWallet.value = null
@@ -43,6 +50,13 @@ function handleSelectWallet(wallet) {
 function handleClear() {
   formWallet.name = ''
   formWallet.privateKey = ''
+}
+
+async function handleGetUniqueName(pubkeyBytes) {
+  const hashBuffer = await crypto.subtle.digest('SHA-256', pubkeyBytes)
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+  return 'wallet-' + hashHex.slice(0, 8)
 }
 </script>
 
@@ -70,9 +84,15 @@ function handleClear() {
         class="w-full h-[170px] p-4 outline-none resize-none"
         placeholder="Private Key"
       />
-      <div class="px-4 pb-4">
+      <div class="px-4 pb-4 flex gap-4">
         <div
-          class="w-full p-3 bg-purple-500 flex justify-center text-white font-medium select-none cursor-pointer hover:bg-purple-600"
+          class="shrink-0 w-[50px] h-[50px] border border-purple-300 flex justify-center items-center text-lg select-none cursor-pointer hover:bg-purple-100"
+          @click="handleCreatePrivateKey"
+        >
+          ✨
+        </div>
+        <div
+          class="w-full h-[50px] bg-purple-500 flex justify-center items-center text-white font-medium select-none cursor-pointer hover:bg-purple-600"
           @click="handleAddWallet"
         >
           Add Wallet
